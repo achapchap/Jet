@@ -1,5 +1,8 @@
 
       subroutine distri(a1,a2,rt1,rt2,et1,et2,n1,n2,rft,nn,kk)
+! on exit :
+! rft, nn, rt1 and rt2 (TO BE COMPLETED)
+
 
       implicit real*8(a-h,o-z)
       dimension rft(*)
@@ -10,6 +13,8 @@
         if (a1.lt.1.d0) then
           rt1 = 0.5d0
           rt2 = 0.5d0
+! number of elements of a PG with sum rt1/2, common factor e1/2 and scale a1/2
+! Did not understand why rt1 and rt2 start with 0.5 ... is this iterative ? 
           n1  = int(log( 1.d0-(1.d0-e1)*rt1/a1)/log(e1) )
           n2  = int(log( 1.d0-(1.d0-e2)*rt2/a2)/log(e2) )
         else
@@ -40,11 +45,13 @@
 
         rft(1) = 0.d0
       do i = 1,n1
+! start from the begnining and increase rft
           rft(i+1) = rft(i) + a1*e1**(i-1)
         enddo
 
         rft(nn+1) = 1.d0
       do i = 1,n2-1
+! start from the end and decrease rft
           rft(nn+1-i) = rft(nn+2-i) - a2*e2**(i-1)
         enddo
 
@@ -68,12 +75,15 @@
       else 
 
         if (n1.gt.0.and.n2.gt.0) then
+! rt2: sum of geom progression with scale factor a2 ,  common factor e2 and n2 terms
           rt2 = a2*(1.d0-e2**n2)/(1.d0-e2)
           rt1 = 1.d0 - rt2
 !ccc          a1  = rt1*(1.d0-e1)/(1.d0-e1**n1)     
           call newrap(a1,rt1,e1,n1)
         else if (n1.lt.1) then
           n2 = nn
+! e2: geom progression common ratio
+! n2: number of terms 
           a2 = (1.d0-e2)/(1.d0-e2**n2 )
           n1 = 0 
         else if (n2.lt.1) then
@@ -87,11 +97,13 @@
 
         rft(1) = 0.d0
       do i = 1,n1
+! elements increase with i 
           rft(i+1) = rft(i) + a1*e1**(i-1)
         enddo
 
         rft(nn+1) = 1.d0
       do i = 1,n2
+! elements decrease with i 
           rft(nn+1-i) = rft(nn+2-i) - a2*e2**(i-1)
         enddo
 
