@@ -1,8 +1,18 @@
 
       subroutine distri(a1,a2,rt1,rt2,et1,et2,n1,n2,rft,nn,kk)
 ! on exit :
-! rft, nn, rt1 and rt2 (TO BE COMPLETED)
+! rft, n1,n2,nn, rt1 and rt2 (TO BE COMPLETED)
 
+
+
+! This subroutine is an iteractive procedure that discretize a line in two portios rt1 and rt2 in a "smooth" fashion 
+! (i.e keeping the panels about the same lengths in region of transition from rt1 to rt2). 
+! In the region rt1/2 the initial panel amplitude is a1/2 and it grows by a factor of et1/2 . 
+! rt1: represents the curvilinear abscissa from the apex of the body to the jet root
+! rt2: represents the curvilinear abscissa from the jet root to  the tip of the jet
+! n1 : is the number of panels in the region spanned by rt1 
+! n2 : is the number of panels in the region spanned by rt2 
+! nn: total number of panels returned by the discretization
 
       implicit real*8(a-h,o-z)
       dimension rft(*)

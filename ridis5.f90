@@ -8,6 +8,56 @@
      &                  ycnsl,zcnsl,ycb,zcb,tcb,jt,tysl,nngo,&
      &                  ne,phinsl,npsl,di,ang,tc,kord,frint,tn,&
      &                  nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
+
+! Description of the variables:
+! k =0/1 : recalculate the jet vertices / dont recalaculate
+! ng : number of elements in the modelled parte of the jet
+! kget 0/1 : jet model not activated /  activated
+! ynsl, znsl : coordinates of the  vertices of the free surface
+! ygb,zgb : Tobe understood
+! escr : growth factor of the discretization 
+! npc : number of panels on  the body not considering the ones on the jet
+! npt : total number of panels 
+! yn,zn : coordinates of the vertices of the body (To be confirmed !)
+! ycn,zcn : coordinates of the centroids of the body (To be confirmed !)  
+! ampli : (calculated in shallow check meaning)
+! ygn,zgn,ygs2,zgs2,tg : coordinates, 2ond derivatives  and absicissa of the body spline representation of the body 
+! ngo: number of points in the spline representation of the body that are not separated (exact when there is no sep)
+! ngo1 : ngo + numbe of separated points (as incremented in splver2) of the body spline representation
+! nsep =  0/1 in case of no flow separation/flow separation
+! nsepo: dont know what it is , but its not being used 
+! ksep =  array with 0 for non separated points / 1 for separated
+! phin : potential vector on the body 
+! ycnsl,zcnsl : coordinates of the free surface vertices
+! ycb,zcb,tcb: 
+! jt : interation number of the main loop 
+! nngo  ???:
+!ne: fixed at 2 at line 79
+!phinsl : potential vector the free surface panels
+!npsl: number of panels on the free surface including the ng elements on the free surface , see skecht
+! On exit (TO BE CONFIRMED)
+!di: length of the vertice 
+!ang: angle of the vertex in radians  
+!tc:  
+!kord:  
+!frint: fraction of the transition region 
+!tn: 
+!nnold: last value of nn saved recursively by the this function
+!nn1old: last value of nn1 saved recursively by the this function
+!ramii: factor used with amii to define the size of the first panel to be meshed by distri a1
+!ramiii: "     "  a2
+!eskkk: another growth factor of the discretization  
+!kmed:
+!ksup:
+ 
+
+
+
+
+
+
+
+
 !
 !      include"slam_p.h"
       implicit real*8 (a-h,o-z)
@@ -54,15 +104,24 @@
 ! -  ricalcolo centroidi getto
 !cc        write(25,*) ' # jt ng',jt,ng
 
-!Step 1:find yb,zb and the abscissa ta, when there is no separation
+
+! On notation:
+!ngo  : number of points on the body spline representation  which are not separated 
+!ngo1 : ngo + number of separated points  
+
+
+! Step 1:
+! Idea: Find the intersection between a line passing on FS vertice (perpendicular to a body panel) and the 
+! The coordinates of this point  are yb,zb  and the corresponding body length is up to the sep. point is ta
+! These are saved in ycb(jj), zcb(jj) and tcb(jj)
       do ii=1,ng
           y1  = ycnsl(ii)
           z1  = zcnsl(ii)
-          jj  = ng-ii+1 ! runs from ng to 1
-          jjj  = npc+jj ! runs from npc+ng to npc+1 
+          jj  = ng-ii+1 ! runs from ng to 1 (index of the vector ycb,zcb,tcb)
+          jjj  = npc+jj ! runs from npc+ng to npc+1 (from the apex of the jet to the bulk on the body side) 
           if(ksep(jjj).ne.1)then
 !          else
-      do i=1,ngo1-1       ! loop in the body up to the sep point (ngo1,  TO BE CONFORMED!)
+      do i=1,ngo1-1       ! loop in the body points (separation points are included)
              w1y = zgn(i+1) - zgn(i)
              w1z = -(ygn(i+1) - ygn(i))
              w2y = ygn(i+1) - ygn(i)
@@ -88,17 +147,17 @@
              endif
           enddo
 ! - DA INSERIRE LA DEFINIZIONE DEI PUNTI GETTO NON RIGRIGLIATI (ksep=1)
-          else
+          else !(ksep==1) 
 
 
 ! in the case the flow is separated just copy the arrays, no need for rearangement 
-!TO DO : check the indeation bearing in mind  the new convention we are following        
-! So ycb receives body centroid coordinates of the separated points 
+!TO DO : check the indexation bearing in mind  the new convention we are following        
+! So ycb receives body centroid coordinates of the separated points
              ycb(jj) = ycn(jjj) 
              zcb(jj) = zcn(jjj) 
              tcb(jj) = tc(jjj) 
 !cc               write(25,'(i4,3d15.7,i4)') jj,ycb(jj),zcb(jj),tcb(jj),1
-          endif
+          endif ! end ksep if
   999     continue
         enddo
 !cc         write(25,*)
@@ -108,7 +167,7 @@
 !        write(26,'(i4,3d15.7)') 1,ygb(1),zgb(1),tgb(1)
 
 ! Redistribute the  jet vertices by interpolation of the abscissa mid point on the body
-! note that tb was corrected/updated in the precedent loop
+! note that tcb was corrected/updated in the precedent loop
       do i=1,ng-1
           tb = 0.5d0*(tcb(i)+tcb(i+1))
           call splint(tb,yb,zb,ygn,zgn,ygs2,zgs2,tg,ngo1,npamx,0)
@@ -117,19 +176,16 @@
           tgb(i+1) = tb 
 !cc          write(26,'(i4,3d15.7)') i+1,yb,zb,tb
       enddo
-        if(nsep.eq.0)then
+        if(nsep.eq.0) then
 ! enforce ygb in case of no separation 
           ygb(ng+1) = ynsl(1) 
           zgb(ng+1) = znsl(1)
         else
-! TODO: to find out what is ngo1! 
-! the suspicion is that the ngo1 is the point on the body where the flow separates  
+! In case of separation the last vertex of the jet is the ...... 
           ygb(ng+1) = ygn(ngo1) 
           zgb(ng+1) = zgn(ngo1)
         endif
-
-! update body abscissa once ygb/zgb(ng+1) were found 
-
+! update body abscissa once the last point of the jet (ng+1) has been found 
         dy = ygb(ng+1)-ygb(ng) 
         dz = zgb(ng+1)-zgb(ng)
         dd = sqrt(dy**2+dz**2)
