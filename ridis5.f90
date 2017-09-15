@@ -29,17 +29,19 @@
 ! ksep =  array with 0 for non separated points / 1 for separated
 ! phin : potential vector on the body 
 ! ycnsl,zcnsl : coordinates of the free surface vertices
-! ycb,zcb,tcb: 
-! jt : interation number of the main loop 
+! ycb,zcb,tcb: coordinates and abscissa of the new redistribudition of centroids on the jet modelled part of 
+! the body (only jet part ? or also bulk part ?) , both are being modified by the current function. 
+! jt : interation number of the main loop
+! tysl: not being used in the present version 
 !ne: fixed at 2 at line 79
 !phinsl : potential vector the free surface panels
 !npsl: number of panels on the free surface including the ng elements on the free surface , see skecht
 ! On exit (TO BE CONFIRMED)
 !di: length of the vertice 
 !ang: angle of the vertex in radians  
-!tc:  
+!tc: centroid abscissa , TO BE UNDERSTOOD FURTHER  
 !frint: fraction of the transition region 
-!tn: 
+!tn: vertex abscissa , TO BE UNNDERSTOOD FURTHER 
 !nnold: last value of nn saved recursively by the this function
 !nn1old: last value of nn1 saved recursively by the this function
 !ramii: factor used with amii to define the size of the first panel to be meshed by distri a1
