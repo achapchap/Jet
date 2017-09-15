@@ -31,7 +31,6 @@
 ! ycnsl,zcnsl : coordinates of the free surface vertices
 ! ycb,zcb,tcb: 
 ! jt : interation number of the main loop 
-! nngo  ???:
 !ne: fixed at 2 at line 79
 !phinsl : potential vector the free surface panels
 !npsl: number of panels on the free surface including the ng elements on the free surface , see skecht
@@ -39,7 +38,6 @@
 !di: length of the vertice 
 !ang: angle of the vertex in radians  
 !tc:  
-!kord:  
 !frint: fraction of the transition region 
 !tn: 
 !nnold: last value of nn saved recursively by the this function
@@ -47,8 +45,12 @@
 !ramii: factor used with amii to define the size of the first panel to be meshed by distri a1
 !ramiii: "     "  a2
 !eskkk: another growth factor of the discretization  
-!kmed:
-!ksup:
+!nngo: running the code its found that its  an integer with the same value as ng; its value is set in a call to prefin.f, 
+!in principle it stores the old  value of nng and is used to check if the number of elements in the jet 
+!has changed or not (nng is just kget*ng)
+!kmed and ksup : are initialized with zero at intial.f and changed to 1 only in ridis5.f (retaled to the separated jet)
+!nsep, nsepo: boolean flags related separation 0/1 (nsepo was used in ridis4 but it is not being used here)
+!kord: boolean 1/2 related to flow separation not really sure what is its role 
  
 
 
