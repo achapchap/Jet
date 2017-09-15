@@ -20,17 +20,17 @@
 ! npt : total number of panels 
 ! yn,zn : coordinates of the vertices of the body (To be confirmed !)
 ! ycn,zcn : coordinates of the centroids of the body (To be confirmed !)  
-! ampli : (calculated in shallow check meaning)
+! ampli: is the length of body where the jet model is acting upon (TO BE CONFIRMED) 
 ! ygn,zgn,ygs2,zgs2,tg : coordinates, 2ond derivatives  and absicissa of the body spline representation of the body 
 ! ngo: number of points in the spline representation of the body that are not separated (exact when there is no sep)
-! ngo1 : ngo + numbe of separated points (as incremented in splver2) of the body spline representation
+! ngo1 : ngo + number of separated points (as incremented in splver2) of the body spline representation
 ! nsep =  0/1 in case of no flow separation/flow separation
 ! nsepo: dont know what it is , but its not being used 
 ! ksep =  array with 0 for non separated points / 1 for separated
 ! phin : potential vector on the body 
 ! ycnsl,zcnsl : coordinates of the free surface vertices
-! ycb,zcb,tcb: coordinates and abscissa of the new redistribudition of centroids on the jet modelled part of 
-! the body (only jet part ? or also bulk part ?) , both are being modified by the current function. 
+! ycb,zcb,tcb: centroids  and abscissa of the jet modelled part of the body 
+! both are being modified by the current function. 
 ! jt : interation number of the main loop
 ! tysl: not being used in the present version 
 !ne: fixed at 2 at line 79
@@ -54,13 +54,6 @@
 !nsep, nsepo: boolean flags related separation 0/1 (nsepo was used in ridis4 but it is not being used here)
 !kord: boolean 1/2 related to flow separation not really sure what is its role 
  
-
-
-
-
-
-
-
 
 !
 !      include"slam_p.h"
