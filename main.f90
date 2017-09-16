@@ -77,7 +77,7 @@ program main
 
  real*8            ::  vfall0,vfall,pro0,ampp,pfraz,ancut,escr,estr, &
                        tend,frdt,amplim,t,dt,proat,ang,di,yc, gfrac,rmg, &
-                       epsgg, eskg, ampli,frtend,flux,coeffdi
+                       epsgg, eskg, ampli,frtend,flux,coeffdi, epsg
 
 
 
@@ -124,7 +124,7 @@ program main
 ! kphi: index 0 for Neumann BC, 1 for Dirichlet, 2 for far field
 !     boundary, 3 panel belong to the modelled regionfor specific use (e.g. jet modelling)
 
-  integer, dimension(npamx)     :: kphi
+ integer, dimension(npamx)     :: kphi
 
 ! Dold filter variables
 
@@ -145,7 +145,7 @@ integer :: kmed,ksup
 
  integer                       :: i,ip,mm, npc_entry,npc_exit
 
- real*8                        :: deph2
+ real*8                        :: deph2, nng
 
  real*8, dimension(npamx)      :: depn1,depn2 
 
@@ -166,7 +166,11 @@ integer :: kmed,ksup
     nfil,nbody,ybody,zbody,vfall0,vfall,proat,npc,npsl,npf,kget,mget,&
     mgeti,npt,yv,zv,yce,zce,amp,amplim,tmy,tmz,rny,rnz,phi,dphi,kphi,&
     cdold,ddold,t,jt,llf,phid,dphid,tbody,ybodys2,zbodys2,ybodyn,zbodyn,&
-    kord,ksep,kmed, ksup)
+    kord,ksep,kmed, ksup,ng,ampli,epsg)
+ 
+ ! initialize nng
+ nng = kget*ng
+
 
  if (krest.eq.0) then
 
@@ -225,10 +229,6 @@ write(*,*) 'coeffdi------=',coeffdi
 
    if(jt.le.30) vfall = vfall0*float(jt)/float(30)   
   
-
-
-   
-
    call check(yv,zv,yce,zce,amp,vym1,vzm1,frdt,frtend,tend,t,jt,npc,npsl, &
               npf,npamx,kget,vfall,zbodyn,nbody,dt)
 
@@ -242,7 +242,6 @@ write(*,*) 'coeffdi------=',coeffdi
 !
 ! Displacement of the centroids of free surface panels and update the 
 ! velocity potential on them, predictor RK step
-
    do ip = npc+1,npc+npsl
      deph2      = vym1(ip)**2 + vzm1(ip)**2
      depn1(ip)  = deph2/2.d0   ! here the gravity term should be included
@@ -275,21 +274,55 @@ write(*,*) 'coeffdi------=',coeffdi
 ! discretization of the wetted body contour. NOTE: in the intermediate
 ! RK step (first argument is 0) the number of panels is NOT varied 
  
- call ridis(0,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
-                 yn,zn,ycn,zcn,phin,tbody)
+! call ridis(0,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
+!                 yn,zn,ycn,zcn,phin,tbody)
+
+
+ call ridis6(0,ng,proat,kget,ygb,zgb,&
+             escr,npc,npt,yn,zn,ycn,zcn,ampli,&
+             ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
+             nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+             phinsl,npsl,di,ang,tc,kord,frint,tn,&
+             nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
 ! reinitialization of the tangents and normals to the body contour, of
 ! the panel amplitude and of the boundary conditions on the body
+  
+ call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &
+             amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
 
- call nortan(vfall,npamx,yn,zn,amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
 
 ! solution of the boundary value problem based on the new panel
 ! distribution (yn,zn) and velocity potential (phin)
 
- call dipole(yn,zn,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp) 
+! Here we need to break into 2 cases kget =0/1
 
- call solver( k2dtax,kffb,yn,zn,amp,kphi,phid,dphid,npc,npsl,npf, &
-                 kget,mget,mgeti,npamx,phi,dphi,coeffdi)
+
+ if (kget == 0)
+
+   call dipole(yn,zn,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp) 
+
+   call solver( k2dtax,kffb,yn,zn,amp,kphi,phid,dphid,npc,npsl,npf, &
+                kget,mget,mgeti,npamx,phi,dphi,coeffdi)
+ 
+   write(*,*) 'coeffdi------=',coeffdi
+ 
+ else  ! (TO BE completed)
+
+   call  get(ng,npc,ycnsl,zcnsl,ycn,zcn,yn,zn, &
+             xigs,zegs,xigb,zegb,xigf,zegf)
+
+   !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
+   !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
+   !            xigs,zegs,xigb,zegb,xigf,zegf, &
+   !            ty,tz,ry,rz,tmy,tmz,rny,rnz,tmysl,tmzsl,rnysl,rnzsl, &
+   !            ph,dphn,dphnb,a,b,c,d,e,phi,phib,dphisl,dphibsl,rl, &
+   !            mb,mf,mt,m,n,nt,ntt,xi,ze,xis,zes,jt,ksep,kse,kord,kor) 
+ 
+   
+   !call calsol  
+ endif
+
 
 write(*,*) 'coeffdi------=',coeffdi 
 !stop
@@ -303,7 +336,7 @@ write(*,*) 'coeffdi------=',coeffdi
 ! Compute the velocity components along the body boundary and free
 ! surface for the 2ond RK step, v = v_t + v_n
 
-   do i = 1,npc+npsl
+   do i = 1,npc+nng+npsl
      vym2(i) = dpht(i)*tmy(i)+dphi(i)*rny(i)
      vzm2(i) = dpht(i)*tmz(i)+dphi(i)*rnz(i)
    enddo
@@ -322,7 +355,9 @@ write(*,*) 'coeffdi------=',coeffdi
 ! NOTE: this part will have to be updated to deal with the flow
 ! separated part, as well as with the modelled part of the jet
 
-   do ip = npc+1,npc+npsl
+! using the old indexation the FS nodes are in the position npc+nng+1
+
+   do ip = npc+nng+1,npc+npsl
      deph2      = vym2(ip)**2 + vzm2(ip)**2
      depn2(ip)  = deph2/2.d0   ! here the gravity term should be included
      ycn(ip)    = yce(ip) + 0.5*(vym1(ip)+vym2(ip))*dt
@@ -338,6 +373,7 @@ write(*,*) 'coeffdi------=',coeffdi
 call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
               spot,spre,llf,npamx,t)
 
+! TO DO: splver will need to be updated to tackle the flow separation
 call splver(ycn,zcn,npc,npsl,proat,estr,tbody,ybodyn,zbodyn,ybodys2,zbodys2,nbody, &
         kffb,iint,ampli,npamx,yn,zn)
 
@@ -348,74 +384,66 @@ call splver(ycn,zcn,npc,npsl,proat,estr,tbody,ybodyn,zbodyn,ybodys2,zbodys2,nbod
 ! the panel vertices are modified by splver, call nortan to set 
 ! the BCs to the new panels (yn,zn)  
 
-call nortan(vfall,npamx,yn,zn,amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
+call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &                
+            amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
+
+!call nortan(vfall,npamx,yn,zn,amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
 
 ! identification of the jet region along the body (return ng,ygb,zgb,ygcb,zcgb)
-!Warning will need to change this to include separation, it will be a output of splver
+!Warning will need to change this to include separation, it will be a output of splver2
  
-ngo1=nbody
+
+ ngo1=nbody
  call shallo(yn,zn,ycn,zcn,kget,jt,npsl,npc,npamx, &
              ng,ampli,rmg,jjget,phin,dphi,epsgg,eskg,gfrac, &
             ybodyn,zbodyn,ybodys2,zbodys2,tbody,tgb,nbody,ngo1,nsep, &
              ycb,zcb,ygb,zgb,tcb,nngo)
  
-print*, 'ng================', ng
 
-
-call  get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
-                          xigs,zegs,xigb,zegb,xigf,zegf)
-
-
+ nng = ng*kget  ! Update nng in case Jet model is activated very important 
+ print*, 'ng================', ng,nng,kget
+  
+ 
 
 
 
 ! ----------------- File 3
-call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
+ call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
               spot,spre,llf,npamx,t)
 
  
 ! the free surface discretization is updated to guarantee adequate
 ! accuracy 
-call disuni(jt,yn,zn,ycn,zcn,phin,npsl,npamx,escr,kget,estr, &
+ call disuni(jt,yn,zn,ycn,zcn,phin,npsl,npamx,escr,kget,estr, &
                 amplim,npc,iiget,ygb,zgb)
-
-
-
    
 ! DEBUG OUTPUT: NOTE, here the velocities have not been updated yet
-
-
 
 ! WARNING !!! 
 !  if we swicth 0-.1 ridis is cutting all the panels on the body, need 
 ! to investigate 
 
-npc_entry =npc
+ npc_entry =npc
 
-call ridis(1,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
+ !call ridis(1,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
               yn,zn,ycn,zcn,phin,tbody)
 
+ call ridis6(0,ng,proat,kget,ygb,zgb,&
+             escr,npc,npt,yn,zn,ycn,zcn,ampli,&
+             ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
+             nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+             phinsl,npsl,di,ang,tc,kord,frint,tn,&
+             nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
+
+ npc_exit = npc
 
 
-npc_exit = npc
-
-
-  do ip = 1, npc
+  do ip = 1, npc + nng
      yv(ip) =  yn(ip)
      zv(ip) =  zn(ip) 
      yce(ip) = ycn(ip)
      zce(ip) = zcn(ip)
      kphi(ip) = 0
-    ! for debugging ONLY
-  !  amy      = yn(ip+1) - yn(ip)
-  !  amz      = zn(ip+1) - zn(ip)
-  !  am       = sqrt(amy*amy + amz*amz)
-  !  amp(ip)  =  am
-  !  tmy(ip)  =  amy/am
-  !  tmz(ip)  =  amz/am
-  !  rny(ip)  =  tmz(ip)
-  !  rnz(ip)  = -tmy(ip)
-  !  dphi(ip) = -vfall*rnz(ip)
   enddo
 
    !yv(npc+1) = yn(npc+1)
@@ -439,7 +467,7 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 
 ! set Dirichlet BCs on the free surface
 
-   do ip=npc+1,npc+npsl
+   do ip=npc+nng+1,npc+nng+npsl
      yv(ip) = yn(ip)
      zv(ip) = zn(ip)
      yce(ip) = ycn(ip)
@@ -447,8 +475,8 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
      kphi(ip) = 1
      phi(ip) = phin(ip) 
    enddo
-   yv(npc+npsl+1) = yn(npc+npsl+1)
-   zv(npc+npsl+1) = zn(npc+npsl+1)
+   yv(npc+nng+npsl+1) = yn(npc+nng+npsl+1)
+   zv(npc+nng+npsl+1) = zn(npc+nng+npsl+1)
 
 ! Free surface filtering
    
@@ -457,16 +485,19 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 
    mm = mod(jt,ift) ! filter every 4 time steps
 
+! with separation this call changes as well see main.f lines 635-647
    if(mm.eq.0) then
-     call doldfil1(yv,npc+1,npc+npsl+1,npamx,iford,nfil,cdold,ddold)
-     call doldfil1(zv,npc+1,npc+npsl+1,npamx,iford,nfil,cdold,ddold)
-     call doldfil1(phi,npc+1,npc+npsl,npamx,iford,nfil,cdold,ddold)
+     call doldfil1(yv,npc+nng+1,npc+nng+npsl+1,npamx,iford,nfil,cdold,ddold)
+     call doldfil1(zv,npc+nng+1,npc+nng+npsl+1,npamx,iford,nfil,cdold,ddold)
+     call doldfil1(phi,npc+nng+1,npc+nng+npsl,npamx,iford,nfil,cdold,ddold)
    endif
 
 ! the panel vertices are modified by doldfill1, call nortan to set 
 ! the BCs to the new panels (yv,zv)  
-   call nortan(vfall,npamx,yv,zv,amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
+!   call nortan(vfall,npamx,yv,zv,amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
 
+   call nortan(vfall,npamx,yv,zv,kget,ng,ygb,zgb, &                
+               amp,tmy,tmz,rny,rnz,npc,npsl,dphi)
 ! solution of the boundary value problem based on the panel
 ! distribution (yv,zv) and velocity potential (phi)
 
@@ -474,17 +505,41 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 ! ----------------- File 5 
   call output(yv,zv,yce,zce,phi,dphi,vym1,vzm1,npc,npsl,npf,scon,svel, &
              spot,spre,llf,npamx,t)
+
 !  write(*,*) 'llf---------------',llf
 !  if (jt == 12)  stop 
 
+! call recalc_dphtsl
 
- call  dipole(yv,zv,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp) 
- 
- call solver( k2dtax,kffb,yv,zv,amp,kphi,phid,dphid,npc,npsl,npf, &
-                 kget,mget,mgeti,npamx,phi,dphi,coeffdi)
+  if (kget == 0)
+
+     call dipole(yv,zv,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp)
+
+     call solver( k2dtax,kffb,yv,zv,amp,kphi,phid,dphid,npc,npsl,npf, &
+                kget,mget,mgeti,npamx,phi,dphi,coeffdi)
+
+     write(*,*) 'coeffdi------=',coeffdi
+
+   else  ! (TO BE completed)
+
+     call  get(ng,npc,ycnsl,zcnsl,ycn,zcn,yn,zn, &
+             xigs,zegs,xigb,zegb,xigf,zegf)
+
+   !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
+   !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
+   !            xigs,zegs,xigb,zegb,xigf,zegf, &
+   !            ty,tz,ry,rz,tmy,tmz,rny,rnz,tmysl,tmzsl,rnysl,rnzsl, &
+   !            ph,dphn,dphnb,a,b,c,d,e,phi,phib,dphisl,dphibsl,rl, &
+   !            mb,mf,mt,m,n,nt,ntt,xi,ze,xis,zes,jt,ksep,kse,kord,kor) 
+
+
+   !call calsol  
+   endif
+  
+
 ! check flow conservation
   flux = 0.0    
-  do i = 1,npc+npsl 
+  do i = 1,npc+nng+npsl 
   flux = flux + amp(i)*dphi(i)
   enddo
 
@@ -495,12 +550,9 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
     
   call caveta(yce,zce,amp,phi,npc,npsl,npf,kget,mget,mgeti,npamx,dpht)
 
-
-
-
 ! compose velocities in the y,z direction respectively for the next cycle
 
-   do i = 1,npc+npsl
+   do i = 1,npc+nng+npsl
      vym1(i) = dpht(i)*tmy(i)+dphi(i)*rny(i)
      vzm1(i) = dpht(i)*tmz(i)+dphi(i)*rnz(i)
    enddo

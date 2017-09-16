@@ -1,13 +1,12 @@
 
 !     +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-      subroutine ridis5(k,ng,proat,kget,ynsl,znsl,ygb,zgb,&
-     &                  escr,npc,npt,yn,zn,ycn,zcn,ampli,&
-     &                  ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
-     &                  nsep,nsepo,ksep,phin,&
-     &                  ycnsl,zcnsl,ycb,zcb,tcb,jt,tysl,nngo,&
-     &                  ne,phinsl,npsl,di,ang,tc,kord,frint,tn,&
-     &                  nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
+      subroutine ridis6(k,ng,proat,kget,ygb,zgb,&
+                       escr,npc,npt,yn,zn,ycn,zcn,ampli,&
+                       ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
+                       nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+                       phinsl,npsl,di,ang,tc,kord,frint,tn,&
+                       nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
 ! Description of the variables:
 ! k =0/1 : recalculate the jet vertices / dont recalaculate
@@ -72,31 +71,23 @@
       dimension phinsl(npamx),tc(npamx),kord(npamx)
       dimension rft(npamx)
 !
-      write(*,*) '--> ridis5...........'
+      write(*,*) '--> ridis6...........'
 
 ! Small hack split FS centroids/panels in another vector 
-! old code convention
-!  do i=1,npsl  
-!    ycnsl(i) = ycn(npc+i)
-!    ycnsl(i) = zcn(npc+i)
-!    ynsl(i) = yn(npc+i) 
-!    znsl(i) = zn(npc+i)
-!  end 
+! old code convention (TO Be corrected once the code is validated)
+  nng  = ng*kget
+! just parse but now the FS vectors  are defined only locally
+  do i=1,npsl  
+    ycnsl(i) = ycn(npc+nng+i)
+    zcnsl(i) = zcn(npc+nng+i)
+    ynsl(i) = yn(npc+nng+i) 
+    znsl(i) = zn(npc+nng+i)
+  enddo 
 ! last vertice
-!  ynsl(npsl+1( = yn(npc+npsl+1) 
-!  znsl(npsl+1) = zn(npc+npsl+1)
+  ynsl(npsl+1) = yn(npc+nng+npsl+1) 
+  znsl(npsl+1) = zn(npc+nng+npsl+1)
+! hack ends
 
-
-
-
-
-
-
-
-
-
-
-!
       ne   = 2 
       kk   = k
       eskk = escr
@@ -122,7 +113,7 @@
 ! - con kk=0 ricalcolo vertici getto, con kk=1 no
 !
 ! -  ricalcolo centroidi getto
-!cc        write(25,*) ' # jt ng',jt,ng
+        write(25,*) ' # jt ng',jt,ng
 
 
 ! On notation:
@@ -162,7 +153,7 @@
                ycb(jj) = yb 
                zcb(jj) = zb 
                tcb(jj) = ta
-!cc               write(25,'(i4,3d15.7,i4)') jj,yb,zb,ta,0
+               write(25,'(i4,3d15.7,i4)') jj,yb,zb,ta,0
                goto 999 
              endif
           enddo
@@ -180,8 +171,8 @@
           endif ! end ksep if
   999     continue
         enddo
-!cc         write(25,*)
-!cc         write(25,*)
+         write(25,*)
+         write(25,*)
 ! - calcolo vertici getto
 !cc        write(26,*) ' # jt ng',jt,ng
 !        write(26,'(i4,3d15.7)') 1,ygb(1),zgb(1),tgb(1)
@@ -653,6 +644,9 @@
            write(*,*) ycn(npc+nng-ne+1),zcn(npc+nng-ne+1) 
            write(*,*) ycn(npc+nng),zcn(npc+nng) 
            nsep = 1
+           write(*,*) 'The code does not treat separation yet!'
+           stop 
+          
 !           ng   = ng-ne
 !           nng  = nng-ne
 !           yn(npc+nng+1) = yn(npc+nng+1+ne)

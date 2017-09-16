@@ -1,16 +1,21 @@
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-      subroutine solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl,
-     #           ycsl,zcsl,dphi,phi,dphtb,dphtbsl,phb,
-     #           xigs,zegs,xigb,zegb,xigf,zegf,
-     #           ty,tz,ry,rz,tmy,tmz,rny,rnz,tmysl,tmzsl,rnysl,rnzsl,
-     #           ph,dphn,dphnb,a,b,c,d,e,phi,phib,dphisl,dphibsl,rl,    
-     #           mb,mf,mt,m,n,nt,ntt,xi,ze,xis,zes,jt,ksep,kse,kord,kor)
+      subroutine solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
+                 ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
+                 xigs,zegs,xigb,zegb,xigf,zegf, &
+                 ty,tz,ry,rz,tmy,tmz,rny,rnz,tmysl,tmzsl,rnysl,rnzsl, &
+                 ph,dphn,dphnb,a,b,c,d,e,phi,phib,dphisl,dphibsl,rl, &    
+                 mb,mf,mt,m,n,nt,ntt,xi,ze,xis,zes,jt,ksep,kse,kord,kor)
 
 
 
-      include"slam_p.h"
+!      include"slam_p.h"
+
+      implicit real*8 (a-h,o-z)
+      parameter (npamx=3000, ntmx = 400000 )
+      common/costanti/pi
+
       dimension dphn(npamx),dphi(npamx),ph(npamx),dphtb(npamx)
       dimension dphtsl(npamx)
       dimension phisl(npamx),phb(npamx),dphnb(npamx),dphtbsl(npamx)  
@@ -36,12 +41,21 @@
       parameter (naux=3*npamx)
       character*1 trans
 
-! variables description
+! variables description (only the more obscure for the moment):
+! phi,dphi: velocity potential and normal derivative on the body
+! panels
+! phisl,dphisl: velocity potential and normal derivative on the
+! free-surface panels
+! phinsl: free-surface velocity potential at the second R-K level
+! phin: velocity potential in the body + jet  region at the second R-K level
+! dpht,dphtsl: tangential derivative of the velocity potential on
+! body and free-surface, respectively
+
 ! dphtbsl,dphn,dphnb,phb,ph,phib: these arrays are used in an overlapping
 ! region between the bulk of the fluid and the modelled part of
 ! the jet in order to smooth the transition between the two regions
 ! They have to be further understood but it seems they are
-! only used inside solv22 and solv22p
+! only used inside solv22 and solv22p (They get modified here)
 
 ! hp,xj,ze,xis,zes: these variables seems still related to the jet
 ! modelling but not all of them are used at present. Better
@@ -67,6 +81,11 @@
 ! velocity potential (pressure solution)
 
 !frint   = matching region (0=no matching, frint<0.9))
+
+! Important vectors on exit , where the solution is saved are"
+! ph, phb, dphnn, dphnb and a,b,c,d,e 
+
+
 
   m  = int(frint*ng)
   n  = ng - m    ! this defines the part where the pure FEM model is used
@@ -737,7 +756,7 @@
     enddo ! end of the loop in k
 
 
------------------   Arrived here
+!-----------------   Arrived here
 
 
 
@@ -1043,12 +1062,14 @@
   enddo
 
 !        write(76,*)
+!Free surface solution dphn
   do i=mb+1,mb+mf
     dphn(i) = bb(i)
     dphnb(i) = bb(i)
 !        write(77,'(i6,4d15.7)') i,yc(i),zc(i),dphn(i),ph(i)
   enddo
 
+! Body transition region 
   do i=mt+1,mt+m
     if(kse(i).ne.1)then
       phb(i) = bb(i)
