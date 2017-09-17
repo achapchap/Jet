@@ -5,7 +5,7 @@
                        escr,npc,npt,yn,zn,ycn,zcn,ampli,&
                        ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
                        nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
-                       phinsl,npsl,di,ang,tc,kord,frint,tn,&
+                       npsl,di,ang,tc,kord,frint,tn,&
                        nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
 ! Description of the variables:
@@ -82,10 +82,12 @@
     zcnsl(i) = zcn(npc+nng+i)
     ynsl(i) = yn(npc+nng+i) 
     znsl(i) = zn(npc+nng+i)
+    phinsl(i) = phin(npc+nng+i)
   enddo 
 ! last vertice
   ynsl(npsl+1) = yn(npc+nng+npsl+1) 
   znsl(npsl+1) = zn(npc+nng+npsl+1)
+  phinsl(npsl+1) = phin(npc+nng+npsl+1)
 ! hack ends
 
       ne   = 2 

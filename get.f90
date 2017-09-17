@@ -17,7 +17,7 @@ subroutine get(nget,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
 ! functionalities are restored 
 
  nng  = nget
-! just parse but now the FS vectors  are defined only locally
+! just parse,  but now the FS vectors  are defined only locally
   do i=1,npsl
     ycnsl(i) = ycn(npc+nng+i)
     zcnsl(i) = zcn(npc+nng+i)

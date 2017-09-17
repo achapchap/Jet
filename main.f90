@@ -74,12 +74,14 @@ program main
 ! frtend : maximum allowable time step as a fraction of the total simulation time
 ! flux : real variable to check the mass conservation inthe system
 ! coeffdi: time dependent coefficient of the dipole solutio
+! eskkk:  stretching pannelli dal vertice (TO BE READ FROM INPUT!)     
+! frint: fraction of the transition region (usually 0.1, TO BE READ FROM INPUT) 
+! frint: matching region (0=no matching, frint<0.9))
 
  real*8            ::  vfall0,vfall,pro0,ampp,pfraz,ancut,escr,estr, &
                        tend,frdt,amplim,t,dt,proat,ang,di,yc, gfrac,rmg, &
-                       epsgg, eskg, ampli,frtend,flux,coeffdi, epsg
-
-
+                       epsgg, eskg, ampli,frtend,flux,coeffdi, epsg, eskkk, &
+                       frint 
 
 ! The following arrays are used in the Jet modelling part
 ! TODO: describe each array and its content
@@ -116,10 +118,11 @@ program main
 ! nsep : 0 or 1 is a separation flag
 ! kord: boolean 1/2 related to flow separation not really sure what is its role
 ! ksep: boolean 0/1 identify which panels are separated 
-
+! nn1old: last value of nn1 saved recursively by ridis6   
+! nnold:  "    "        nn       " " 
  integer         :: npc,npsl,npf,mget,mgeti,nbody,npt,krest,k2dtax, &
                     kvfall,ksta,kffb,kget,ift,iford,llf,jt,iiget
- integer         :: jjget,ng,nngo,ngo1,nsep 
+ integer         :: jjget,ng,nngo,ngo1,nsep, nn1old, nnold
 
 ! kphi: index 0 for Neumann BC, 1 for Dirichlet, 2 for far field
 !     boundary, 3 panel belong to the modelled regionfor specific use (e.g. jet modelling)
@@ -143,9 +146,9 @@ integer :: kmed,ksup
 
 ! Local Variables
 
- integer                       :: i,ip,mm, npc_entry,npc_exit
+ integer                       :: i,ip,mm, npc_entry,npc_exit, nng
 
- real*8                        :: deph2, nng
+ real*8                        :: deph2
 
  real*8, dimension(npamx)      :: depn1,depn2 
 
@@ -158,7 +161,7 @@ integer :: kmed,ksup
 
  call input (krest,k2dtax,vfall0,kvfall,pro0,ampp,pfraz,ancut,  &
     escr,estr,kffb,tend,frdt,ksta,scon,svel,spot,spre,ift,iford, &
-    npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend)
+    npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend, eskkk,frint)
  
 ! Initialization of the domain boundary and boundary conditions
 
@@ -169,7 +172,7 @@ integer :: kmed,ksup
     kord,ksep,kmed, ksup,ng,ampli,epsg)
  
  ! initialize nng
- nng = kget*ng
+ nng = int(kget*ng)
 
 
  if (krest.eq.0) then
@@ -278,11 +281,19 @@ write(*,*) 'coeffdi------=',coeffdi
 !                 yn,zn,ycn,zcn,phin,tbody)
 
 
+! TO be Cleared and intialized : 
+! ramii 
+! ramiii
+! tc 
+! tn 
+! tysl
+
+
  call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
-             ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
+             ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
              nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
-             phinsl,npsl,di,ang,tc,kord,frint,tn,&
+             npsl,di,ang,tc,kord,frint,tn,&
              nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
 ! reinitialization of the tangents and normals to the body contour, of
@@ -298,7 +309,7 @@ write(*,*) 'coeffdi------=',coeffdi
 ! Here we need to break into 2 cases kget =0/1
 
 
- if (kget == 0)
+ if (kget == 0)   then
 
    call dipole(yn,zn,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp) 
 
@@ -308,9 +319,9 @@ write(*,*) 'coeffdi------=',coeffdi
    write(*,*) 'coeffdi------=',coeffdi
  
  else  ! (TO BE completed)
-
-   call  get(ng,npc,ycnsl,zcnsl,ycn,zcn,yn,zn, &
-             xigs,zegs,xigb,zegb,xigf,zegf)
+   
+   call get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
+                          xigs,zegs,xigb,zegb,xigf,zegf)
 
    !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
    !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
@@ -426,13 +437,13 @@ call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &
  npc_entry =npc
 
  !call ridis(1,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
-              yn,zn,ycn,zcn,phin,tbody)
+ !             yn,zn,ycn,zcn,phin,tbody)
 
  call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
-             ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
+             ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
              nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
-             phinsl,npsl,di,ang,tc,kord,frint,tn,&
+             npsl,di,ang,tc,kord,frint,tn,&
              nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
  npc_exit = npc
@@ -511,7 +522,7 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 
 ! call recalc_dphtsl
 
-  if (kget == 0)
+  if (kget == 0)   then
 
      call dipole(yv,zv,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp)
 
@@ -521,9 +532,8 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
      write(*,*) 'coeffdi------=',coeffdi
 
    else  ! (TO BE completed)
-
-     call  get(ng,npc,ycnsl,zcnsl,ycn,zcn,yn,zn, &
-             xigs,zegs,xigb,zegb,xigf,zegf)
+   call  get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
+            xigs,zegs,xigb,zegb,xigf,zegf)
 
    !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
    !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
