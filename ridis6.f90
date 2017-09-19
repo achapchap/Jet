@@ -4,7 +4,7 @@
       subroutine ridis6(k,ng,proat,kget,ygb,zgb,&
                        escr,npc,npt,yn,zn,ycn,zcn,ampli,&
                        ygn,zgn,ygs2,zgs2,tg,ngo,tgb,iint,ngo1,&
-                       nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+                       nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
                        npsl,di,ang,tc,kord,frint,tn,&
                        nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 

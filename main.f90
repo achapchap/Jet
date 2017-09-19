@@ -46,12 +46,15 @@ program main
 !               contour
 ! ycb,zcb,ygb,zgb : centroids/vertices of the jet region on the body
 ! tgb, tcb : respective abscissas of ygb,zgb and ycb,zcb
+! tc : is the centroid abscissa used by ridis6 (twice) and splver2.f in the old code
+!      its meaning is still to be clarified. in particular whats the diff between tc and tcb ? 
+! tn : seems to be related to tc but its a vertex abcissa 
 
 
  real*8, dimension(npamx) :: yv,zv,yn,zn,yce,zce,ycn,zcn, &
          tmy,tmz,rny,rnz,amp,phi,phin,dphi,dpht,vym1,vym2,vzm1, &
          vzm2,ybody,zbody,ybodyn,zbodyn,tbody,ybodys2,zbodys2,phid, dphid,&
-         ycb,zcb,ygb,zgb,tgb,tcb
+         ycb,zcb,ygb,zgb,tgb,tcb,tc,tn 
 ! vfall0: vertical prescribed velocity (it can be either constant or variable
 !        depending on kvfall)
 ! vfall: actual entry velocity (derived by vfrall0 and kvfall)
@@ -77,6 +80,14 @@ program main
 ! eskkk:  stretching pannelli dal vertice (TO BE READ FROM INPUT!)     
 ! frint: fraction of the transition region (usually 0.1, TO BE READ FROM INPUT) 
 ! frint: matching region (0=no matching, frint<0.9))
+! ramii  = multiple of amii, griglia bordi punto separazione 
+! ramiii  = multiple of amii, griglia vertice corpo 
+! TODO: Add them to the input file and check wha is the variable that is doing the role of amii here !
+
+
+
+
+
 
  real*8            ::  vfall0,vfall,pro0,ampp,pfraz,ancut,escr,estr, &
                        tend,frdt,amplim,t,dt,proat,ang,di,yc, gfrac,rmg, &
@@ -281,18 +292,10 @@ write(*,*) 'coeffdi------=',coeffdi
 !                 yn,zn,ycn,zcn,phin,tbody)
 
 
-! TO be Cleared and intialized : 
-! ramii 
-! ramiii
-! tc 
-! tn 
-! tysl
-
-
  call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
              ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
-             nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+             nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
              npsl,di,ang,tc,kord,frint,tn,&
              nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
@@ -442,7 +445,7 @@ call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &
  call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
              ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
-             nsep,ksep,phin,ycb,zcb,tcb,jt,tysl,nngo,&
+             nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
              npsl,di,ang,tc,kord,frint,tn,&
              nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
 
