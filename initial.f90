@@ -276,8 +276,11 @@ integer :: kmed,ksup
 !   To be kept until the full funcionalities are restored
 
  kmed = 0 
+ print*, kmed
  ksup = 0 
  ngo1=nbody
+
+
  do i=1,npamx
    ksep(i)=0
    kord(i)=2

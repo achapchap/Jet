@@ -34,9 +34,10 @@ moduli=	parameters.o\
         doldfil1.o\
         output.o\
         dipole.o\
-        get.o
-         
-      
+        get.o\
+        distri.o\
+        splint1.o
+   
 spl: $(moduli)
 	$(Cfor) $(COM) $(moduli) -o spl -llapack -lblas 
 
@@ -92,3 +93,7 @@ dipole.o       : dipole.f90
 	$(Cfor) $(SWI) dipole.f90
 get.o       : get.f90
 	$(Cfor) $(SWI) get.f90
+distri.o       : distri.f90
+	$(Cfor) $(SWI) distri.f90
+splint1.o       : splint1.f
+	$(Cfor) $(SWI) splint1.f

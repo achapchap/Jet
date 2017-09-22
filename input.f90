@@ -3,7 +3,8 @@
 
 subroutine input (krest,k2dtax,vfall0,kvfall,pro0,ampp,pfraz,ancut, &
  escr,estr,kffb,tend,frdt,ksta,scon,svel,spot,spre,ift,iford, &
- npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend, eskkk,frint)
+ npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend, eskkk,frint,&
+ ramii, ramiii)
 
  implicit none
 
@@ -28,8 +29,8 @@ subroutine input (krest,k2dtax,vfall0,kvfall,pro0,ampp,pfraz,ancut, &
 ! tend: simulation time
 ! frdt: CFL limit (generally 0.25)
 
- real*8          :: vfall0,pro0,ampp,pfraz,ancut,escr,estr,tend,frdt,frtend & 
-                    eskkk, frint
+ real*8          :: vfall0,pro0,ampp,pfraz,ancut,escr,estr,tend,frdt,frtend, & 
+                    eskkk, frint, ramii, ramiii
 
 ! nbody: number of points of the body geometry (2D contour in case of
 !      2D+t)
@@ -111,6 +112,7 @@ subroutine input (krest,k2dtax,vfall0,kvfall,pro0,ampp,pfraz,ancut, &
 ! To be fixed and read from file  
  eskkk = 1.1d0  
  frint = 0.25d0 
-
+ ramii = 1.0d0
+ ramii = 1.0d0
 return
 end

@@ -92,7 +92,7 @@ program main
  real*8            ::  vfall0,vfall,pro0,ampp,pfraz,ancut,escr,estr, &
                        tend,frdt,amplim,t,dt,proat,ang,di,yc, gfrac,rmg, &
                        epsgg, eskg, ampli,frtend,flux,coeffdi, epsg, eskkk, &
-                       frint 
+                       frint, ramii, ramiii 
 
 ! The following arrays are used in the Jet modelling part
 ! TODO: describe each array and its content
@@ -172,15 +172,16 @@ integer :: kmed,ksup
 
  call input (krest,k2dtax,vfall0,kvfall,pro0,ampp,pfraz,ancut,  &
     escr,estr,kffb,tend,frdt,ksta,scon,svel,spot,spre,ift,iford, &
-    npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend, eskkk,frint)
+    npamx,nbody,ybody,zbody,jjget,gfrac,rmg,epsgg,eskg,frtend, eskkk,frint,&
+    ramii, ramiii)
  
 ! Initialization of the domain boundary and boundary conditions
 
  call initial (krest,kvfall,pro0,ampp,pfraz,escr,estr,kffb,npamx, &
-    nfil,nbody,ybody,zbody,vfall0,vfall,proat,npc,npsl,npf,kget,mget,&
+    nfil,nbody,ybody,zbody,vfall0,epsgg,vfall,proat,npc,npsl,npf,kget,mget,&
     mgeti,npt,yv,zv,yce,zce,amp,amplim,tmy,tmz,rny,rnz,phi,dphi,kphi,&
     cdold,ddold,t,jt,llf,phid,dphid,tbody,ybodys2,zbodys2,ybodyn,zbodyn,&
-    kord,ksep,kmed, ksup,ng,ampli,epsg)
+    kord,ksep,kmed, ksup,ng,ampli,epsg,ngo1)
  
  ! initialize nng
  nng = int(kget*ng)

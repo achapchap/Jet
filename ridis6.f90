@@ -57,7 +57,7 @@
 !
 !      include"slam_p.h"
       implicit real*8 (a-h,o-z)
-      parameter (npamx=3000, ntmx = 400000 )
+      parameter (npamx=5000, ntmx = 400000 )
       common/costanti/pi
 
       dimension ygb(npamx),zgb(npamx),ynsl(npamx),znsl(npamx)
