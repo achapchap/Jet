@@ -83,11 +83,15 @@
     ynsl(i) = yn(npc+nng+i) 
     znsl(i) = zn(npc+nng+i)
     phinsl(i) = phin(npc+nng+i)
+!    print*, 'y,z----------', i ,ynsl(i),znsl(i)
   enddo 
 ! last vertice
   ynsl(npsl+1) = yn(npc+nng+npsl+1) 
   znsl(npsl+1) = zn(npc+nng+npsl+1)
   phinsl(npsl+1) = phin(npc+nng+npsl+1)
+
+!  print*, 'last vertice y,z----------', npsl ,ynsl(npsl+1),znsl(npsl+1)
+
 ! hack ends
 
       ne   = 2 
@@ -408,7 +412,7 @@
 
 ! - !! eskk =! 1.d0  !!!
 
-! definition of nn , **important** , number of elements to m mesh amdi using amplitude amii (TO BE CHECKED)
+! definition of nn , **important** , number of elements to m mesh amdi using growth factor  amii (TO BE CHECKED)
       nn = int( log( 1.d0+(eskk-1.d0)*amdi/amii)/log(eskk) )
       no = npc - ng*(1-kget)
 ! - calcolo differenza
@@ -450,7 +454,7 @@
       zgb(1)   = z
       tgb(1)   = r
       dr       = amii
-!cc      write(27,'(2i4,3d15.7)') jt,nn+1,r, y,z
+      write(27,'(2i4,3d15.7)') jt,nn+1,r, y,z
 ! nn indeed seems to be related to number of panels in the bulk region of the body 
 ! so that nn1 should relate the number of points added or cut in the jet modelled part (To be checked!)
       do ip = nn,1,-1
@@ -461,7 +465,7 @@
         yn(ip)   = y 
         zn(ip)   = z
         dr       = dr*eskk
-!cc        write(27,'(2i4,3d15.7)') jt,ip,r,y,z
+        write(27,'(2i4,3d15.7)') jt,ip,r,y,z
       enddo
 !
       endif 
@@ -469,7 +473,7 @@
 ! At this point it seems the body is remeshed 
 !Therefore npc can be updated 
 
-!cc        write(27,*)
+      write(27,*)
       npco = npc
       npc  = nn  + nn1 +  ng*(1-kget)
       npt  = npt + ninc  
@@ -485,8 +489,8 @@
 
 
 
-!cc      write(27,*) 
-!cc      write(27,*)
+      write(27,*) 
+      write(27,*)
 !
       if(kk.eq.0)then
 !
@@ -517,22 +521,24 @@
       tt     = sqrt(dy**2+dz**2) 
       tpo(1) = tt
       phpo(1)= phin(1) 
-      write(*,*) 'ppppp0 ',npco,nngo  
-!cc      write(24,*) '# jt',jt,nsep
+      write(*,*) 'npco,nngo ',npco,nngo  
+      write(24,*) '# jt',jt,nsep
 
 ! Build a potential representation as function 
 ! of curviliniar abiscissa , i.e a table : tpo x phpo
       do i=2,npco+nngo
+
         dy = ycn(i)-ycn(i-1)
         dz = zcn(i)-zcn(i-1)
         dd     = sqrt(dy**2+dz**2)
         tt     = tt+dd
         tpo(i) = tt
         phpo(i)= phin(i)
-!cc        write(24,'(i4,4d15.7)') i,ycn(i),zcn(i),tpo(i),phpo(i)
+        write(24,'(i4,4d15.7)') i,ycn(i),zcn(i),tpo(i),phpo(i)
+        print*,i,ycn(i),zcn(i),tpo(i),phpo(i)
       enddo
-!cc      write(24,*)
-!cc      write(24,*)
+      write(24,*)
+      write(24,*)
 ! -- estrapolo potenziale:
 ! Very close expansion to what we have done at ridis.f90 really
       write(*,*) 'ppppp0 '  
@@ -541,7 +547,7 @@
       phia = phin(npco+nngo)
       phib = phin(npco+nngo-1)
       write(*,*) 'ppppp1 '  
-      write(*,*) phia,phib
+      write(*,*) 'phia,phib,dtt',phia,phib,dtt
       delphi = (phia-phib)/dtt 
       write(*,*) 'ppppp2 ' ,ng 
       write(*,*) phia,delphi,tpo(npco+nngo+1),tpo(npco+nngo)
@@ -689,6 +695,30 @@
       endif
 !
       endif     
-!
+
+
+! This function modifies/regrid the body in both bulk/jet/separated portions
+! so once it is finished we need to reconstruct the arrays yn,zn,ycn,zcn for the 
+! free surface bit (the body bit should be correct)
+
+    
+    nng = kget*ng
+
+    print*, 'jt = ', jt
+    print*, 'npc = ', npc
+    print*, 'npsl = ', npsl 
+    do i=npc+nng+1,npsl+npc+nng
+      yn(i) = ynsl(i-npc+nng)
+      zn(i) = znsl(i-npc+nng)
+      ycn(i)= ycnsl(i-npc+nng)
+      zcn(i) = zcnsl(i-npc+nng)
+      phin(i) = phin(i-npc+nng)
+    enddo
+  ! last vertex
+   yn(npsl+npc+nng+1) = ynsl(npsl+1)
+   zn(npsl+npc+nng+1) = znsl(npsl+1) 
+   print*, 'last vertex, yn,zn',  yn(npsl+npc+nng+1) , zn(npsl+npc+nng+1) 
+
+
       return
       end
