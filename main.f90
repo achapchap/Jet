@@ -282,6 +282,8 @@ write(*,*) 'coeffdi------=',coeffdi
 ! The intersection with the body contour and the far field points are 
 ! determined as well.
 
+
+print*, 'got here 0'
  call splver(ycn,zcn,npc,npsl,proat,estr,tbody,ybodyn,zbodyn,ybodys2,zbodys2,nbody, &
         kffb,iint,ampli,npamx,yn,zn)
 
@@ -293,7 +295,7 @@ write(*,*) 'coeffdi------=',coeffdi
 !                 yn,zn,ycn,zcn,phin,tbody)
 
 
- call ridis6(0,ng,proat,kget,ygb,zgb,&
+ call ridis6(1,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
              ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
              nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
@@ -389,6 +391,9 @@ call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
               spot,spre,llf,npamx,t)
 
 ! TO DO: splver will need to be updated to tackle the flow separation
+
+! The code is bugging up in this call at the moment
+
 call splver(ycn,zcn,npc,npsl,proat,estr,tbody,ybodyn,zbodyn,ybodys2,zbodys2,nbody, &
         kffb,iint,ampli,npamx,yn,zn)
 
