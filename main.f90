@@ -295,7 +295,8 @@ print*, 'got here 0'
 !                 yn,zn,ycn,zcn,phin,tbody)
 
 
- call ridis6(1,ng,proat,kget,ygb,zgb,&
+print*, 'calling ridis from line 298'
+ call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
              ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
              nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
@@ -448,7 +449,9 @@ call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &
  !call ridis(1,proat,escr,npc,npsl,iint,npamx,ybodyn,zbodyn,nbody,ybodys2,zbodys2,& 
  !             yn,zn,ycn,zcn,phin,tbody)
 
- call ridis6(0,ng,proat,kget,ygb,zgb,&
+
+ print*, 'calling ridis fro line 457'
+ call ridis6(1,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
              ybodyn,zbodyn,ybodys2,zbodys2,tbody,nbody,tgb,iint,ngo1,&
              nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&

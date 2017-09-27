@@ -408,18 +408,21 @@
 
       else
  
- 99     write(*,*) 'PUPUPU' ! in case kmed.eq.0.and.kk.eq.0 we end up here.
-
+ 99     write(*,*) 'PUPUPU' ! in case kk ==1 and kmed == 0  we end up here.
+        
 ! - !! eskk =! 1.d0  !!!
+     
 
-! definition of nn , **important** , number of elements to m mesh amdi using growth factor  amii (TO BE CHECKED)
+! print*, 'kk and kmed ===', kk, kmed 
+! definition of nn , **important** , number of elements to mesh, with length amdi using growth factor  amii (TO BE CHECKED)
       nn = int( log( 1.d0+(eskk-1.d0)*amdi/amii)/log(eskk) )
       no = npc - ng*(1-kget)
 ! - calcolo differenza
 ! panels to be added/cut 
       ninc = nn+ng*(1-kget)-npc
 ! - non cambio se kk=0
-      if(kk.eq.0.and.ng.gt.0) then
+
+      if(kk.eq.0.and.ng.ge.0) then
         ninc = 0
         nn   = no
       endif
