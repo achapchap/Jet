@@ -19,7 +19,7 @@ subroutine nortan( &
 
  nng = kget*ng
 
- write(*,*) '--> nortan......'
+ write(*,*) '--> nortan......,nng,kget,ng', nng,kget,ng
 
 ! Body nodes update normals and body  boundary condition
 
@@ -35,6 +35,8 @@ subroutine nortan( &
    dphi(ip) = -vfall*rnz(ip)
  enddo
 
+! print*, 'nortan ---- first loop----ok !' 
+
 ! Jet nodes update only the amplitudes on body side 
 ! and assume no point is separated 
   do ip = 1,nng
@@ -48,6 +50,8 @@ subroutine nortan( &
     rnz(npc+ip) = -tmy(npc+ip)
     dphi(npc+ip)=  -vfall*rnz(npc+ip)
   enddo
+
+! print*, 'nortan ---- second loop----ok !'
 
 
 ! Same for free surface nodes, i.e update normals, FS BC is integrated in time

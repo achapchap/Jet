@@ -263,6 +263,8 @@ write(*,*) 'coeffdi------=',coeffdi
      ycn(ip)    = yce(ip) + vym1(ip)*dt
      zcn(ip)    = zce(ip) + vzm1(ip)*dt
      phin(ip)   = phi(ip) + depn1(ip)*dt
+!     print*,'phi--------------', ip, phin(ip)
+
    enddo
 
 ! Body moved down by vfall*dt. 
@@ -295,6 +297,10 @@ print*, 'got here 0'
 !                 yn,zn,ycn,zcn,phin,tbody)
 
 
+ call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
+              spot,spre,llf,npamx,t)
+
+
 print*, 'calling ridis from line 298'
  call ridis6(0,ng,proat,kget,ygb,zgb,&
              escr,npc,npt,yn,zn,ycn,zcn,ampli,&
@@ -302,6 +308,14 @@ print*, 'calling ridis from line 298'
              nsep,ksep,phin,ycb,zcb,tcb,jt,nngo,&
              npsl,di,ang,tc,kord,frint,tn,&
              nnold,nn1old,ramii,ramiii,eskkk,kmed,ksup)
+
+
+ print*, 'jt , ng------------------>', jt, ng 
+
+ call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
+              spot,spre,llf,npamx,t)
+
+
 
 ! reinitialization of the tangents and normals to the body contour, of
 ! the panel amplitude and of the boundary conditions on the body
@@ -316,19 +330,19 @@ print*, 'calling ridis from line 298'
 ! Here we need to break into 2 cases kget =0/1
 
 
- if (kget == 0)   then
+! if (kget == 0)   then
 
    call dipole(yn,zn,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp) 
 
    call solver( k2dtax,kffb,yn,zn,amp,kphi,phid,dphid,npc,npsl,npf, &
                 kget,mget,mgeti,npamx,phi,dphi,coeffdi)
  
-   write(*,*) 'coeffdi------=',coeffdi
+!   write(*,*) 'coeffdi------=',coeffdi
  
- else  ! (TO BE completed)
+! else  ! (TO BE completed)
    
-   call get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
-                          xigs,zegs,xigb,zegb,xigf,zegf)
+!   call get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
+!                          xigs,zegs,xigb,zegb,xigf,zegf)
 
    !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
    !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
@@ -339,7 +353,7 @@ print*, 'calling ridis from line 298'
  
    
    !call calsol  
- endif
+! endif
 
 
 write(*,*) 'coeffdi------=',coeffdi 
@@ -425,9 +439,6 @@ call nortan(vfall,npamx,yn,zn,kget,ng,ygb,zgb, &
  print*, 'ng================', ng,nng,kget
   
  
-
-
-
 ! ----------------- File 3
  call output(yn,zn,ycn,zcn,phin,dphi,vym2,vzm2,npc,npsl,npf,scon,svel, &
               spot,spre,llf,npamx,t)
@@ -534,18 +545,18 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 
 ! call recalc_dphtsl
 
-  if (kget == 0)   then
+!  if (kget == 0)   then
 
      call dipole(yv,zv,npc,npsl,npf,kffb,kphi,estr,phid,dphid,npamx,amp)
 
      call solver( k2dtax,kffb,yv,zv,amp,kphi,phid,dphid,npc,npsl,npf, &
                 kget,mget,mgeti,npamx,phi,dphi,coeffdi)
 
-     write(*,*) 'coeffdi------=',coeffdi
+!     write(*,*) 'coeffdi------=',coeffdi
 
-   else  ! (TO BE completed)
-   call  get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
-            xigs,zegs,xigb,zegb,xigf,zegf)
+!   else  ! (TO BE completed)
+!   call  get(ng,npc,npamx,npsl,jt,ycn,zcn,yn,zn, &
+!            xigs,zegs,xigb,zegb,xigf,zegf)
 
    !call solv22(frint,ng,npc,npsl,yce,zce,yv,zv,ysl,zsl, &
    !            ycsl,zcsl,dphi,phisl,dphtb,dphtbsl,phb, &
@@ -556,7 +567,7 @@ write(*,*) 'npc, npc_exit,npc_entry, npsl ------', npc, npc_exit,npc_entry,npsl
 
 
    !call calsol  
-   endif
+!   endif
   
 
 ! check flow conservation

@@ -331,8 +331,11 @@ subroutine shallo(yn,zn, &
 ! jjget)
 ! Honestly, it is not clear why iiget and jjget are needed. This is
 ! something deserving further understanding
-
-   if (ng.gt.0.and.jt.gt.jjget) kget = 1 
+   print*, 'shallo ----- jt,jjget', jt, jjget
+   if (ng.gt.0.and.jt.gt.jjget) then 
+       kget = 1
+       print*,'shallo changes kget----------->', kget
+   endif 
 
 ! - Discretization (or rediscretization if the jet was already
 !   initialized) of the MODELLED PART of the jet

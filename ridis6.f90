@@ -70,11 +70,13 @@
       dimension ycb(npamx),zcb(npamx),tcb(npamx)
       dimension phinsl(npamx),tc(npamx),kord(npamx)
       dimension rft(npamx)
-!
+!      integer :: kget
       write(*,*) '--> ridis6...........'
 
 ! Small hack split FS centroids/panels in another vector 
 ! old code convention (TO Be corrected once the code is validated)
+
+
   nng  = ng*kget
 ! just parse but now the FS vectors  are defined only locally
   do i=1,npsl  
@@ -83,12 +85,11 @@
     ynsl(i) = yn(npc+nng+i) 
     znsl(i) = zn(npc+nng+i)
     phinsl(i) = phin(npc+nng+i)
-!    print*, 'y,z----------', i ,ynsl(i),znsl(i)
+!    print*, 'y,z,pot----------', i ,ynsl(i),znsl(i),phinsl(i)
   enddo 
 ! last vertice
   ynsl(npsl+1) = yn(npc+nng+npsl+1) 
   znsl(npsl+1) = zn(npc+nng+npsl+1)
-  phinsl(npsl+1) = phin(npc+nng+npsl+1)
 
 !  print*, 'last vertice y,z----------', npsl ,ynsl(npsl+1),znsl(npsl+1)
 
@@ -425,6 +426,7 @@
       if(kk.eq.0.and.ng.ge.0) then
         ninc = 0
         nn   = no
+        print*, 'no change in panels,no,npc,ninc,ng', no,npc,ninc,ng
       endif
 ! before the jet modelling kicks in 
 ! no panel is ever cut 
@@ -469,6 +471,7 @@
         zn(ip)   = z
         dr       = dr*eskk
         write(27,'(2i4,3d15.7)') jt,ip,r,y,z
+        print*, jt,ip,r,y,z
       enddo
 !
       endif 
@@ -538,7 +541,7 @@
         tpo(i) = tt
         phpo(i)= phin(i)
         write(24,'(i4,4d15.7)') i,ycn(i),zcn(i),tpo(i),phpo(i)
-        print*,i,ycn(i),zcn(i),tpo(i),phpo(i)
+!        print*,i,ycn(i),zcn(i),tpo(i),phpo(i)
       enddo
       write(24,*)
       write(24,*)
@@ -715,12 +718,12 @@
       zn(i) = znsl(i-npc+nng)
       ycn(i)= ycnsl(i-npc+nng)
       zcn(i) = zcnsl(i-npc+nng)
-      phin(i) = phin(i-npc+nng)
+      phin(i) = phinsl(i-npc+nng)
     enddo
   ! last vertex
    yn(npsl+npc+nng+1) = ynsl(npsl+1)
    zn(npsl+npc+nng+1) = znsl(npsl+1) 
-   print*, 'last vertex, yn,zn',  yn(npsl+npc+nng+1) , zn(npsl+npc+nng+1) 
+!   print*, 'last vertex, yn,zn',  yn(npsl+npc+nng+1) , zn(npsl+npc+nng+1) 
 
 
       return
