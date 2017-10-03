@@ -812,10 +812,11 @@
         ff = ff + pre(i)*amp(i)*rnz(i)
         ff2 = ff2 + pres(i)*amp(i)*rnz(i)
 !        write(41,'(i6,6d15.6)') i,yce(i),zce(i),p1,-p2,pre(i),pre2(i)
-!        if(i.eq.npc) write(41,*)
+        write(41,'(i6,6f14.6)') i,yce(i),zce(i),p1,-p2,pre(i),pre2(i)
+        if(i.eq.npc) write(41,*)
       enddo
-!      write(41,*)
-!      write(41,*)
+      write(41,*)
+      write(41,*)
       ff  = -2.d0*ff
       ff2 = -2.d0*ff2
       write(99,'(i10,3d15.7)') jt,t,ff,ff2

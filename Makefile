@@ -99,8 +99,8 @@ solv1.o     : solv1.f
 	$(F77) $(SWI) solv1.f
 solv2.o     : solv2.f
 	$(F77) $(SWI) solv2.f
-solv22.o     : solv22.f
-	$(F77) $(SWI) solv22.f
+solv22.o     : solv22.f90
+	$(F77) $(SWI) solv22.f90
 solv22p.o     : solv22p.f
 	$(F77) $(SWI) solv22p.f
 solv2p.o     : solv2p.f
